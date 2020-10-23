@@ -415,6 +415,31 @@ class Client extends EventEmitter {
         return result;
     }
 
+    async sendMessageToUnknownContact(contactId, message) {
+        const encodedMessage = encodeURI(message);
+        const URL = `https://wa.me/${contactId}?text=${encodedMessage}`;
+
+        await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
+
+        this.pupPage.click('#action-button', { delay: 500 });
+
+        const element = await this.pupPage.waitForSelector(
+            '#fallback_block > div > div > a',
+            { timeout: 3000, visible: true }
+        );
+        element.click({ delay: 500 });
+
+        const sendButton = await this.pupPage.waitForSelector(
+            '#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button',
+            { timeout: 200000, visible: true }
+        );
+
+        sendButton.click({ delay: 500 });
+        this.destroy().then(() => {
+            this.initialize();
+        });
+    }
+
     /**
      * Message options.
      * @typedef {Object} MessageSendOptions
