@@ -421,23 +421,32 @@ class Client extends EventEmitter {
 
         await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
 
-        this.pupPage.click('#action-button', { delay: 500 });
+        this.pupPage.click('#action-button', { delay: 250 });
 
         const element = await this.pupPage.waitForSelector(
             '#fallback_block > div > div > a',
             { timeout: 3000, visible: true }
         );
-        element.click({ delay: 500 });
+        element.click({ delay: 220 });
 
         const sendButton = await this.pupPage.waitForSelector(
             '#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button',
-            { timeout: 200000, visible: true }
+            { visible: true, timeout: 10000 }
         );
 
-        sendButton.click({ delay: 500 });
-        this.destroy().then(() => {
-            this.initialize();
-        });
+        sendButton.click({ delay: 230 });
+
+        // confirmation to sent event
+        await this.pupPage.waitForSelector(
+            '#main > div._3h-WS > div > div > div.z_tTQ > div._2hqOq.message-out.focusable-list-item > div > div > div > div._2frDn > div > div > span > svg',
+            { visible: 2000, timeout: 10000 }
+        );
+
+        setTimeout(() => {
+            this.destroy().then(() => {
+                this.initialize();
+            });
+        }, 2500);
     }
 
     /**
