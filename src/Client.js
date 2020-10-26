@@ -417,17 +417,17 @@ class Client extends EventEmitter {
 
     async sendMessageToUnknownContact(contactId, message) {
         const encodedMessage = encodeURI(message);
-        const URL = `https://wa.me/${contactId}?text=${encodedMessage}`;
+        const URL = `https://api.whatsapp.com/send/?phone=${contactId}&text=${encodedMessage}&app_absent=0`;
 
         await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
 
         this.pupPage.click('#action-button', { delay: 250 });
 
-        const element = await this.pupPage.waitForSelector(
+        const useWebBtn = await this.pupPage.waitForSelector(
             '#fallback_block > div > div > a',
             { timeout: 3000, visible: true }
         );
-        element.click({ delay: 220 });
+        useWebBtn.click({ delay: 220 });
 
         const input = await this.pupPage.waitForSelector('#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text');
         await input.focus()
