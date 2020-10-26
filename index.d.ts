@@ -78,6 +78,8 @@ declare namespace WAWebJS {
     /** Send a message to a specific chatId */
     sendMessage(chatId: string, content: MessageContent, options?: MessageSendOptions): Promise<Message>
 
+    sendMessageToUnknownContact(contactId: string, message: string): Promise<void>;
+
     /** Marks the client as online */
     sendPresenceAvailable(): Promise<void>
 

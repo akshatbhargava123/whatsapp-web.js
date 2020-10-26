@@ -429,24 +429,17 @@ class Client extends EventEmitter {
         );
         element.click({ delay: 220 });
 
-        const sendButton = await this.pupPage.waitForSelector(
-            '#main > footer > div._3ee1T._1LkpH.copyable-area > div:nth-child(3) > button',
-            { visible: true, timeout: 10000 }
-        );
-
-        sendButton.click({ delay: 230 });
-
-        // confirmation to sent event
-        await this.pupPage.waitForSelector(
-            '#main > div._3h-WS > div > div > div.z_tTQ > div._2hqOq.message-out.focusable-list-item > div > div > div > div._2frDn > div > div > span > svg',
-            { visible: 2000, timeout: 10000 }
-        );
+        const input = await this.pupPage.waitForSelector('#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text');
+        await input.focus()
+        
+        await input.press('Enter');
+        await input.type(String.fromCharCode(13));
 
         setTimeout(() => {
             this.destroy().then(() => {
                 this.initialize();
             });
-        }, 2500);
+        }, 3000);
     }
 
     /**

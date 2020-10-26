@@ -30,6 +30,10 @@ client.on('qr', () => {
     console.log('Please scan the QR code on the browser.');
 });
 
+client.on('authenticated', (session) => {
+    fs.writeFileSync(SESSION_FILE_PATH, JSON.stringify(session))
+});
+
 client.on('ready', () => {
     const shell = repl.start('wwebjs> ');
     shell.context.client = client;
