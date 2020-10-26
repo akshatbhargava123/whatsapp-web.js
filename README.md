@@ -1,6 +1,6 @@
-[![npm](https://img.shields.io/npm/v/whatsapp-web.js.svg)](https://www.npmjs.com/package/whatsapp-web.js) [![Depfu](https://badges.depfu.com/badges/4a65a0de96ece65fdf39e294e0c8dcba/overview.svg)](https://depfu.com/github/pedroslopez/whatsapp-web.js?project_id=9765) ![WhatsApp_Web 2.2043.8](https://img.shields.io/badge/WhatsApp_Web-2.2043.8-brightgreen.svg) [![Discord Chat](https://img.shields.io/discord/698610475432411196.svg?logo=discord)](https://discord.gg/H7DqQs4)  
+# modern-whatsapp-web.js
+_This project is a forked version of [official whatsappp-web.js](https://github.com/pedroslopez/whatsapp-web.js), this currently contains only a single special feature over the original library i.e. sending message to unknown contacts._
 
-# whatsapp-web.js
 A WhatsApp API client that connects through the WhatsApp Web browser app
 
 It uses Puppeteer to run a real instance of Whatsapp Web to avoid getting blocked.
