@@ -416,32 +416,38 @@ class Client extends EventEmitter {
     }
 
     async sendMessageToUnknownContact(contactId, message) {
-        const encodedMessage = encodeURI(message);
-        const URL = `https://api.whatsapp.com/send/?phone=${contactId}&text=${encodedMessage}&app_absent=0`;
+        try {
+            const encodedMessage = encodeURI(message);
+            const URL = `https://api.whatsapp.com/send/?phone=${contactId}&text=${encodedMessage}&app_absent=0`;
+    
+            await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
+    
+            await this.pupPage.click('#action-button', { delay: 250 });
+    
+            const useWebBtn = await this.pupPage.waitForSelector(
+                '#fallback_block > div > div > a',
+                { timeout: 3000, visible: true }
+            );
+            await useWebBtn.click({ delay: 220 });
+    
+            const input = await this.pupPage.waitForSelector(
+                '#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text',
+                { timeout: 15000, visible: true },
+            );
+    
+            await input.focus()
+            
+            await input.press('Enter', { delay: 220 });
+            await input.type(String.fromCharCode(13), { delay: 220 });
+    
+            await this.pupPage.waitFor(3000)
+        } catch {
+            console.log(`number ${contactId} is invalid!`);
+        } finally {
+            await this.destroy();
+            await this.initialize();
+        }
 
-        await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
-
-        await this.pupPage.click('#action-button', { delay: 250 });
-
-        const useWebBtn = await this.pupPage.waitForSelector(
-            '#fallback_block > div > div > a',
-            { timeout: 3000, visible: true }
-        );
-        await useWebBtn.click({ delay: 220 });
-
-        const input = await this.pupPage.waitForSelector(
-            '#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text',
-            { timeout: 15000, visible: true },
-        );
-
-        await input.focus()
-        
-        await input.press('Enter', { delay: 220 });
-        await input.type(String.fromCharCode(13), { delay: 220 });
-
-        await this.pupPage.waitFor(3000)
-        await this.destroy();
-        await this.initialize();
     }
 
     /**
