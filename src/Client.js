@@ -60,15 +60,17 @@ class Client extends EventEmitter {
     /**
      * Sets up events and requirements, kicks off authentication request
      */
-    async initialize() {
+    async initialize(session) {
         const browser = await puppeteer.launch(this.options.puppeteer);
         const page = (await browser.pages())[0];
         page.setUserAgent(this.options.userAgent);
 
         this.pupBrowser = browser;
         this.pupPage = page;
+        this.options.session = session;
 
-        if (this.options.session) {
+        console.log('session:', JSON.stringify(session, null, 2));
+        if (session) {
             await page.evaluateOnNewDocument(
                 session => {
                     localStorage.clear();
@@ -76,7 +78,7 @@ class Client extends EventEmitter {
                     localStorage.setItem('WASecretBundle', session.WASecretBundle);
                     localStorage.setItem('WAToken1', session.WAToken1);
                     localStorage.setItem('WAToken2', session.WAToken2);
-                }, this.options.session);
+                }, session);
         }
 
         await page.goto(WhatsWebURL, {
@@ -86,7 +88,7 @@ class Client extends EventEmitter {
 
         const KEEP_PHONE_CONNECTED_IMG_SELECTOR = '[data-asset-intro-image-light="true"], [data-asset-intro-image-dark="true"]';
 
-        if (this.options.session) {
+        if (session) {
             // Check if session restore was successfull 
             try {
                 await page.waitForSelector(KEEP_PHONE_CONNECTED_IMG_SELECTOR, { timeout: this.options.authTimeoutMs });
@@ -101,7 +103,7 @@ class Client extends EventEmitter {
                     browser.close();
                     if (this.options.restartOnAuthFail) {
                         // session restore failed so try again but without session to force new authentication
-                        this.options.session = null;
+                        session = null;
                         this.initialize();
                     }
                     return;
@@ -149,7 +151,7 @@ class Client extends EventEmitter {
             return JSON.stringify(window.localStorage);
         }));
 
-        const session = {
+        const newSession = {
             WABrowserId: localStorage.WABrowserId,
             WASecretBundle: localStorage.WASecretBundle,
             WAToken1: localStorage.WAToken1,
@@ -165,7 +167,7 @@ class Client extends EventEmitter {
          * @param {string} session.WAToken1
          * @param {string} session.WAToken2
          */
-        this.emit(Events.AUTHENTICATED, session);
+        this.emit(Events.AUTHENTICATED, newSession);
 
         // Check window.Store Injection
         await page.waitForFunction('window.Store != undefined');
@@ -419,7 +421,7 @@ class Client extends EventEmitter {
         try {
             const encodedMessage = encodeURI(message);
             const URL = `https://api.whatsapp.com/send/?phone=${contactId}&text=${encodedMessage}&app_absent=0`;
-    
+
             await this.pupPage.goto(URL, { waitUntil: 'load', timeout: 0 });
     
             await this.pupPage.click('#action-button', { delay: 250 });
@@ -429,7 +431,7 @@ class Client extends EventEmitter {
                 { timeout: 3000, visible: true }
             );
             await useWebBtn.click({ delay: 220 });
-    
+
             const input = await this.pupPage.waitForSelector(
                 '#main > footer > div._3ee1T._1LkpH.copyable-area > div._3uMse > div > div._3FRCZ.copyable-text.selectable-text',
                 { timeout: 15000, visible: true },
@@ -445,7 +447,7 @@ class Client extends EventEmitter {
             console.log(`number ${contactId} is invalid!`);
         } finally {
             await this.destroy();
-            await this.initialize();
+            await this.initialize(this.options.session);
         }
 
     }
