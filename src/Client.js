@@ -435,11 +435,9 @@ class Client extends EventEmitter {
         await input.press('Enter');
         await input.type(String.fromCharCode(13));
 
-        setTimeout(() => {
-            this.destroy().then(() => {
-                this.initialize();
-            });
-        }, 3000);
+        await this.pupPage.waitFor(3000)
+        await this.destroy();
+        await this.initialize();
     }
 
     /**
