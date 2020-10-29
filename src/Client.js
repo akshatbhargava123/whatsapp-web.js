@@ -69,7 +69,7 @@ class Client extends EventEmitter {
         this.pupPage = page;
         this.options.session = session;
 
-        console.log('session:', JSON.stringify(session, null, 2));
+        // console.log('session:', JSON.stringify(session, null, 2));
         if (session) {
             await page.evaluateOnNewDocument(
                 session => {
@@ -104,6 +104,7 @@ class Client extends EventEmitter {
                     if (this.options.restartOnAuthFail) {
                         // session restore failed so try again but without session to force new authentication
                         session = null;
+                        // console.log("Auth Failure", JSON.stringify(this.options.session));
                         this.initialize();
                     }
                     return;
@@ -158,6 +159,7 @@ class Client extends EventEmitter {
             WAToken2: localStorage.WAToken2
         };
 
+        this.options.session = newSession;
         /**
          * Emitted when authentication is successful
          * @event Client#authenticated
@@ -447,6 +449,7 @@ class Client extends EventEmitter {
             console.log(`number ${contactId} is invalid!`);
         } finally {
             await this.destroy();
+            // console.log("in finally block", JSON.stringify(this.options.session));
             await this.initialize(this.options.session);
         }
 
